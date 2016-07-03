@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/PingFangM.ttf</file>
+        <file>font/textfill-advl.png</file>
+        <file>font/textfill-bbs.png</file>
+        <file>font/textfill-mingmei.png</file>
+        <file>font/textfill-orange.png</file>
+        <file>font/textfill-test.png</file>
+    </qresource>
+</RCC>

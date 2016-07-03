@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>MainForm.ui.qml</file>
+        <file>B2Label.qml</file>
+        <file>B2LabelFunc.qml</file>
+    </qresource>
+</RCC>
