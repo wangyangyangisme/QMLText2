@@ -33,7 +33,7 @@ ApplicationWindow {
         y: 500
         text: 'fadeout'
         onClicked: {
-            label.fadeout(1000)
+            label.fadeout(2000)
         }
     }
 }
