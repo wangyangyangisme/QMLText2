@@ -28,13 +28,13 @@ Item {
         id: func
     }
 
-    // text with shadow & play fx
+    // t module (text+shadow+grad)
     Item{
         id: t
         width: parent.width
         height: text0.height
 
-        // text module
+        // text0 module
         // using: fontInfo: ({name:'Ping Fang SC',pointSize:80,color:'white',lineGap:0.1})
         Text{
             id: text0
@@ -52,7 +52,7 @@ Item {
             visible: false
         }
 
-        // shadow fx module
+        // shadow module <--- text0
         // using: property var shadowInfo: ({offset:{x:2,y:2}, opacity:0.7})
         Text{
             id: shadow
@@ -70,98 +70,96 @@ Item {
             opacity: shadowInfo.opacity
             text: text0.text
             wrapMode: text0.wrapMode
-            visible: false
         }
 
-        // play fx module -- apply to the root node
-        property real playProcess:1
+        // gradient module <--- text0
         LinearGradient{
-            id: playGrad
-            anchors.fill: text0
-            start: Qt.point(0,0)
-            end: Qt.point(parent.width,0)
-            gradient: Gradient{
-                GradientStop {position:0; color:Qt.rgba(1,1,1,1)}
-                GradientStop {position:1; color:Qt.rgba(1,1,1,0)}
-            }
-            visible: false
-        }
-        ThresholdMask{
-            id: playMask
+            id: grad
             source: text0
-            maskSource: playGrad
             // geo
             anchors.fill: text0
             // props
-            spread: 0.5
-            threshold: 1-parent.playProcess
-        }
-        NumberAnimation on playProcess {id:playAnim;from:0;to:1;running:false;
-            property var myOnStopped
-            onStopped:myOnStopped()
-        }
-        function play(speed,onStopped){
-            if(!speed || speed<0) speed=1.0
-            var totalWidth=func.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
-            playAnim.duration=totalWidth/text0.width/speed * 1000
-            playAnim.myOnStopped=function(){
-                playProcess=1
-                if(onStopped) onStopped()
+            start: Qt.point(0,0)
+            end: Qt.point(0,text0.height)
+            gradient: Gradient{
+                GradientStop {position:0; color:Qt.rgba(1,1,1,1)}
+                GradientStop {position:0.4; color:Qt.rgba(1,1,1,1)}
+                GradientStop {position:1; color:Qt.rgba(0.5,0.5,1,1)}
             }
-            playAnim.restart()
         }
-        function complete(){
-            playAnim.complete()
-        }
-    }
+        visible: false
+    } // end of t
 
-    // gradient fx module
+    // play module <-- 't'
+    property real playProcess:1
     LinearGradient{
-        id: grad
-        source: t
-        // geo
+        id: playGrad
         anchors.fill: t
-        // props
         start: Qt.point(0,0)
-        end: Qt.point(0,t.height)
+        end: Qt.point(t.width,0)
         gradient: Gradient{
             GradientStop {position:0; color:Qt.rgba(1,1,1,1)}
-            GradientStop {position:0.4; color:Qt.rgba(1,1,1,1)}
-            GradientStop {position:1; color:Qt.rgba(0.5,0.5,1,1)}
+            GradientStop {position:1; color:Qt.rgba(1,1,1,0)}
         }
         visible: false
     }
+    ThresholdMask{
+        id: playMask
+        source: t
+        maskSource: playGrad
+        // geo
+        anchors.fill: t
+        // props
+        opacity: 0.5
+        spread: 0.5
+        threshold: 1-playProcess
+    }
+    NumberAnimation on playProcess {id:playAnim;from:0;to:1;running:false;
+        property var myOnStopped
+        onStopped:myOnStopped()
+    }
+    function play(speed,onStopped){
+        if(!speed || speed<0) speed=1.0
+        var totalWidth=func.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
+        playAnim.duration=totalWidth/text0.width/speed * 1000
+        playAnim.myOnStopped=function(){
+            playProcess=1
+            if(onStopped) onStopped()
+        }
+        playAnim.restart()
+    }
+    function complete(){
+        playAnim.complete()
+    }
 
-    // fadeout fx module
+    // fadeout module <--- 'play'
     property real fadeoutProcess:0
     opacity: 1-fadeoutProcess
     GaussianBlur{
         id: gBlur
-        source: grad
+        source: playMask
         // geo
-        anchors.fill: grad
+        anchors.fill: playMask
         // prop
-        opacity: 0.3+2*fadeoutProcess
+        opacity: 0.3+8*fadeoutProcess
         radius: fadeoutProcess*20*scale
         samples: 20
     }
     DirectionalBlur{
         id: dBlur
-        source: grad
+        source: playMask
         // geo
-        anchors.fill: grad
+        anchors.fill: playMask
         // prop
         angle: 90
         length: fadeoutProcess*70*scale
-        opacity: 0.7+1*fadeoutProcess
+        opacity: 0.7+5*fadeoutProcess
         samples: 20
     }
     NumberAnimation on fadeoutProcess {id:fadeoutAnim;from:0;to:1;easing.type:Easing.InOutQuad;running:false;
         property var myOnStopped
         onStopped: myOnStopped()
     }
-
-    // functions
     function fadeout(duration,onStopped){
         fadeoutAnim.duration=duration
         fadeoutAnim.myOnStopped=function(){
@@ -170,11 +168,5 @@ Item {
             if(onStopped) onStopped()
         }
         fadeoutAnim.restart()
-    }
-    function play(speed,onStopped){
-        t.play(speed,onStopped)
-    }
-    function complete(){
-        t.complete()
     }
 }
