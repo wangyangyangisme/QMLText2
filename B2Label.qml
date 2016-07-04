@@ -1,5 +1,7 @@
 import QtGraphicalEffects 1.0
 import QtQuick 2.7
+import B2.LabelFunc 1.0
+import B2.Notification 1.0
 
 /* params TBD */
 // width: 800
@@ -11,7 +13,6 @@ import QtQuick 2.7
 
 /* functions available */
 // play(speed)
-// clear()
 // fadeout(duration[,onStopped])
 
 Item {
@@ -20,13 +21,9 @@ Item {
     scale: 1.0                              // TBD
     property string text: 'Hello Ballade'   // TBD
     height: t.height
-    property var fontInfo: ({name:'Ping Fang SC',pointSize:80,color:'white',lineGap:0.1})
+    property var fontInfo: ({name:'Ping Fang SC', pointSize:80, color:'white', lineGap:0.1})
+    property var colorInfo: ({c1:Qt.rgba(1,1,1,1), c2:Qt.rgba(1,0,0,1), c3:Qt.rgba(0,1,1,1), pos:0.5})
     property var shadowInfo: ({offset:{x:2,y:2}, opacity:0.7})
-
-    // aux module
-    B2LabelFunc{
-        id: func
-    }
 
     // t module (text+shadow+grad)
     Item{
@@ -82,27 +79,45 @@ Item {
             start: Qt.point(0,0)
             end: Qt.point(0,text0.height)
             gradient: Gradient{
-                GradientStop {position:0; color:Qt.rgba(1,1,1,1)}
-                GradientStop {position:0.4; color:Qt.rgba(1,1,1,1)}
-                GradientStop {position:1; color:Qt.rgba(0.5,0.5,1,1)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,0,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,0,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,1,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,1,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,2,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,2,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,3,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,3,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,4,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,4,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,5,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,5,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,6,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,6,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,7,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,7,colorInfo)}
+                GradientStop {position:LabelFunc.calcGradPos(text0.lineCount,8,fontInfo.lineGap,colorInfo.pos);color:LabelFunc.calcGradColor(text0.lineCount,8,colorInfo)}
             }
         }
+
+        // set t's visible to false
         visible: false
     } // end of t
 
     // play module <-- 't'
     property real playProcess:1
-    LinearGradient{
+    property real totalWidth:0
+    Item{
         id: playGrad
         anchors.fill: t
-        start: Qt.point(0,0)
-        end: Qt.point(t.width,0)
-        gradient: Gradient{
-            GradientStop {position:0; color:Qt.rgba(1,1,1,1)}
-            GradientStop {position:1; color:Qt.rgba(1,1,1,0)}
+        Repeater{
+            model: text0.lineCount
+            LinearGradient{
+                width: parent.width
+                height: parent.height/text0.lineCount
+                y: index*height
+                start: Qt.point(0,0)
+                end: Qt.point(t.width * LabelFunc.calcPlayFxPos(text0.lineCount,index,totalWidth/width), 0)
+                gradient: Gradient{
+                    GradientStop {position:0; color:Qt.rgba(1,1,1,LabelFunc.calcPlayFxOpa(text0.lineCount,index*2,totalWidth/width))}
+                    GradientStop {position:1; color:Qt.rgba(1,1,1,LabelFunc.calcPlayFxOpa(text0.lineCount,index*2+1,totalWidth/width))}
+                }
+            }
         }
         visible: false
     }
+
     ThresholdMask{
         id: playMask
         source: t
@@ -120,19 +135,22 @@ Item {
     }
     function play(speed,onStopped){
         if(!speed || speed<0) speed=1.0
-        var totalWidth=func.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
-        playAnim.duration=totalWidth/text0.width/speed * 1000
+        totalWidth=LabelFunc.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
+        var totalDuration=totalWidth/text0.width/speed * 1000
+        playAnim.duration=totalDuration
         playAnim.myOnStopped=function(){
             playProcess=1
             if(onStopped) onStopped()
         }
         playAnim.restart()
+        return totalDuration
     }
     function complete(){
         playAnim.complete()
     }
 
     // fadeout module <--- 'play'
+    signal fadeoutEnded()
     property real fadeoutProcess:0
     opacity: 1-fadeoutProcess
     GaussianBlur{
@@ -166,6 +184,7 @@ Item {
             text=''
             fadeoutProcess=0
             if(onStopped) onStopped()
+            fadeoutEnded()
         }
         fadeoutAnim.restart()
     }

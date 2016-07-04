@@ -4,5 +4,6 @@
         <file>MainForm.ui.qml</file>
         <file>B2Label.qml</file>
         <file>B2LabelFunc.qml</file>
+        <file>B2Notification.qml</file>
     </qresource>
 </RCC>
