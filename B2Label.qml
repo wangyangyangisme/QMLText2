@@ -3,26 +3,30 @@ import QtQuick 2.7
 import B2.LabelFunc 1.0
 import B2.Notification 1.0
 
+/* functions available */
+// play(speed [,onStopped])
+// fadeout(duration [,onStopped])
+// setRect(x,y,w)
+// setScale(s)
+// setText(t)
+// setInfo(fontInfo,colorInfo,shadowInfo)
+
 /* params TBD */
 // width: 800
-// scale: 1.0
+// scaleFactor: 1.0
 // text: ''
 // fontInfo: {name:'Ping Fang SC',pointSize:80,color:'white',lineGap:0.1}
 // colorInfo: {c1:Qt.rgba(...), c2:Qt.rgba(...), c3:Qt.rgba(...), pos:0.5}
 // shadowInfo: {offset:{x:2,y:2}, opacity:0.8}
 
-/* functions available */
-// play(speed)
-// fadeout(duration[,onStopped])
-
 Item {
     id: b2Label
-    width: 800                              // TBD
-    scale: 1.0                              // TBD
-    property string text: 'Hello Ballade'   // TBD
     height: t.height
+    width: 800                              // TBD
+    property string text: 'Hello Ballade'   // TBD
+    property real scaleFactor: 1.0          // TBD
     property var fontInfo: ({name:'Ping Fang SC', pointSize:80, color:'white', lineGap:0.1})
-    property var colorInfo: ({c1:Qt.rgba(1,1,1,1), c2:Qt.rgba(1,0,0,1), c3:Qt.rgba(0,1,1,1), pos:0.5})
+    property var colorInfo: ({c1:Qt.rgba(1,1,1,1), c2:Qt.rgba(1,1,1,1), c3:Qt.rgba(0.5,0.6,1,1), pos:0.5})
     property var shadowInfo: ({offset:{x:2,y:2}, opacity:0.7})
 
     // t module (text+shadow+grad)
@@ -30,19 +34,20 @@ Item {
         id: t
         width: parent.width
         height: text0.height
+        property var lineGeo: ([ ])
 
         // text0 module
         // using: fontInfo: ({name:'Ping Fang SC',pointSize:80,color:'white',lineGap:0.1})
         Text{
             id: text0
             // geo
-            leftPadding: 30*scale
+            leftPadding: 30*scaleFactor
             width: parent.width-2*leftPadding
             height: contentHeight
             // prop
             color: fontInfo.color
             font.family: fontInfo.name
-            font.pointSize: fontInfo.pointSize * scale
+            font.pointSize: fontInfo.pointSize * scaleFactor
             lineHeight: 1.0+fontInfo.lineGap
             text: b2Label.text
             wrapMode: Text.WordWrap
@@ -57,8 +62,8 @@ Item {
             leftPadding: text0.leftPadding
             width: text0.width
             height: text0.height
-            x: shadowInfo.offset.x * scale
-            y: shadowInfo.offset.y * scale
+            x: shadowInfo.offset.x * scaleFactor
+            y: shadowInfo.offset.y * scaleFactor
             z: -1
             // prop
             color: 'black'
@@ -108,10 +113,10 @@ Item {
                 height: parent.height/text0.lineCount
                 y: index*height
                 start: Qt.point(0,0)
-                end: Qt.point(t.width * LabelFunc.calcPlayFxPos(text0.lineCount,index,totalWidth/width), 0)
+                end: Qt.point(t.width, 0)
                 gradient: Gradient{
                     GradientStop {position:0; color:Qt.rgba(1,1,1,LabelFunc.calcPlayFxOpa(text0.lineCount,index*2,totalWidth/width))}
-                    GradientStop {position:1; color:Qt.rgba(1,1,1,LabelFunc.calcPlayFxOpa(text0.lineCount,index*2+1,totalWidth/width))}
+                    GradientStop {position:LabelFunc.calcPlayFxPos(text0.lineCount,index,totalWidth/width);color:Qt.rgba(1,1,1,LabelFunc.calcPlayFxOpa(text0.lineCount,index*2+1,totalWidth/width))}
                 }
             }
         }
@@ -137,6 +142,7 @@ Item {
         if(!speed || speed<0) speed=1.0
         totalWidth=LabelFunc.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
         var totalDuration=totalWidth/text0.width/speed * 1000
+        if(totalDuration<50) totalDuration=50
         playAnim.duration=totalDuration
         playAnim.myOnStopped=function(){
             playProcess=1
@@ -150,7 +156,6 @@ Item {
     }
 
     // fadeout module <--- 'play'
-    signal fadeoutEnded()
     property real fadeoutProcess:0
     opacity: 1-fadeoutProcess
     GaussianBlur{
@@ -160,7 +165,7 @@ Item {
         anchors.fill: playMask
         // prop
         opacity: 0.3+8*fadeoutProcess
-        radius: fadeoutProcess*20*scale
+        radius: fadeoutProcess*20*scaleFactor
         samples: 20
     }
     DirectionalBlur{
@@ -170,7 +175,7 @@ Item {
         anchors.fill: playMask
         // prop
         angle: 90
-        length: fadeoutProcess*70*scale
+        length: fadeoutProcess*70*scaleFactor
         opacity: 0.7+5*fadeoutProcess
         samples: 20
     }
@@ -184,8 +189,26 @@ Item {
             text=''
             fadeoutProcess=0
             if(onStopped) onStopped()
-            fadeoutEnded()
         }
         fadeoutAnim.restart()
+    }
+
+    // other functions
+    function setRect(x,y,w){
+        this.x=x; this.y=y; this.width=width;
+    }
+    function setScale(s){
+        scaleFactor=s
+    }
+    function setText(t){
+        this.text=t
+    }
+    function setInfo(fontInfo,colorInfo,shadowInfo){
+        if(fontInfo)
+            this.fontInfo=fontInfo
+        if(colorInfo)
+            this.colorInfo=colorInfo
+        if(shadowInfo)
+            this.shadowInfo=shadowInfo
     }
 }

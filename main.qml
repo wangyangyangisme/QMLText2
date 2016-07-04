@@ -21,10 +21,13 @@ ApplicationWindow {
     Button {
         x:100
         y:500
-        text: 'string test'
+        text: 'Notification'
         onClicked: {
-            test.text='This is <font color="red">red</font>. '+test.text.length
-
+            Notification.wait({class:'UI',name:'n1',next:{class:'UI',name:'n2',next:{class:'UI',name:'n3'}}}, 'def')
+            Notification.notify({class:'UI',name:'n1'})
+            Notification.notify('def')
+            Notification.notify({class:'UI',name:'n2'})
+            Notification.notify({class:'UI',name:'n3'})
         }
     }
 
@@ -33,9 +36,10 @@ ApplicationWindow {
         y: 500
         text: 'set & play'
         onClicked: {
-            label.fontInfo.lineGap=0
-            label.text='Hello World! This is the first line! and 2nd 3rd'
-            label.play(1)
+            label.fontInfo=({name:'Ping Fang SC', pointSize:50, color:'white', lineGap:0.1})
+            label.text='Hello World! This is the first line! and 2nd 3rd and many, h'
+            label.play(1.0, function(){Notification.notify({class:'Text', name:'play'})})
+            Notification.wait({class:'Text',name:'play'})
         }
     }
     Button {
@@ -52,10 +56,8 @@ ApplicationWindow {
         y: 500
         text: 'fadeout'
         onClicked: {
-            label.fadeout(2000)
-            label.fadeoutEnded.connect(onFadeoutEnded)
-            console.log(Notification.singletonString)
-            Notification.test()
+            label.fadeout(2000, function(){Notification.notify({class:'Text', name:'fade'})})
+            Notification.wait({class:'Text', name:'fade'})
         }
         function onFadeoutEnded(){
             console.log('detected fadeout ended.')

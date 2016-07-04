@@ -59,11 +59,15 @@ FontMetrics{
     }
     // W == totalWidth/lineWidth
     function calcPlayFxPos(lineCount,lineIndex,W){
-        if(lineIndex<lineCount-1)
-            return 1.0
-        return (W-lineIndex)+lineCount*0.1
+        var pos=1.0
+        if(lineIndex===lineCount-1 && W!==0){
+            W+=lineCount*0.2
+            pos=W-lineIndex
+        }
+        return Math.min(1,pos)
     }
     function calcPlayFxOpa(lineCount,i,W){
+        W+=lineCount*0.2
         var p=Math.ceil(i/2)*(1/W)
         return Math.max(0,1-p)
     }
