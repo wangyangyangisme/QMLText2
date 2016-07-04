@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import B2.Notification 1.0
+import B2.File 1.0
 
 ApplicationWindow {
     visible: true
@@ -21,13 +22,29 @@ ApplicationWindow {
     Button {
         x:100
         y:500
-        text: 'Notification'
+        text: 'FileWrite'
         onClicked: {
-            Notification.wait({class:'UI',name:'n1',next:{class:'UI',name:'n2',next:{class:'UI',name:'n3'}}}, 'def')
-            Notification.notify({class:'UI',name:'n1'})
-            Notification.notify('def')
-            Notification.notify({class:'UI',name:'n2'})
-            Notification.notify({class:'UI',name:'n3'})
+            var data='286万岁!'
+            var suc=File.write(File.dataPath('1.sav'), data)
+            this.text='FileWrite:'+suc
+        }
+    }
+    Button {
+        x:100
+        y:400
+        text: 'FileRead'
+        onClicked: {
+            var data=File.read(File.dataPath('1.sav'))
+            this.text='FileRead:'+data
+        }
+    }
+    Button {
+        x:100
+        y:300
+        text: 'FileRemove'
+        onClicked: {
+            var success=File.remove(File.dataPath('1.sav'))
+            this.text="FileRemove:"+success
         }
     }
 

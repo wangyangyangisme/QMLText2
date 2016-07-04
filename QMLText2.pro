@@ -1,9 +1,10 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += core qml quick
 CONFIG += c++11 resources_big
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    b2file.cpp
 
 RESOURCES += qml.qrc \
     font.qrc \
@@ -16,3 +17,6 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 DISTFILES +=
+
+HEADERS += \
+    b2file.h

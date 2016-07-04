@@ -14,7 +14,6 @@ FontMetrics{
     function calcGradPos(lineCount,i,lineGap,colorPos){
         /* contentHeight (normalized as 1.0) contains: 3xgap + 3xTTTT */
         /* some English letters, e.g. 'g' and 'j' will take the space of the gap below */
-        // ----------gap--------    <--fontInfo.lineGap, control point: g1
         // TTTTTTTTTTTTTTTTTTTTT    <--colorInfo.pos, control point: p1
         // ----------gap--------    <--control point: b1, g2; b1 is slightly less than g2,g2=g1+1/lineCount
         // TTTTTTTTTTTTTTTTTTTTT    <--control point: p2; p2=p1+1/lineCount
