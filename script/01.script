@@ -1,1 +1,14 @@
--南望--7-哈哈
+这是一行很长很长的测试脚本，为测试Notification部分的情况。
+
+@if(1===1)then
+      @console.log('OK')
+      @if   (3>5) then
+            @console.log('ERROR')
+      @elseif(3===3) then
+            @console.log('OK')
+      @else
+            @console.log('ERROR')
+      @end
+@else
+      @console.log('error')
+@end

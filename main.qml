@@ -60,6 +60,8 @@ ApplicationWindow {
         y:600
         text: 'Script'
         onClicked: {
+            label.fontInfo=({name:'Ping Fang SC', pointSize:50, color:'white', lineGap:0.1})
+            Func.label=label
             Parser.reset('01.script')
             Parser.run()
         }
