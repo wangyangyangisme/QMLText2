@@ -3,12 +3,20 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import B2.Notification 1.0
 import B2.File 1.0
+import B2.Func 1.0
+import B2.Parser 1.0
 
 ApplicationWindow {
     visible: true
     width: 960
     height: 640
     color: Qt.rgba(0.25,0.25,0.45,1)
+    function assert(cond,str){
+        if(!cond){
+            console.log('*** assertion failed with:',str)
+        }
+    }
+
     B2Label{
         id: label
     }
@@ -47,6 +55,15 @@ ApplicationWindow {
             this.text="FileRemove:"+success
         }
     }
+    Button{
+        x:100
+        y:600
+        text: 'Script'
+        onClicked: {
+            Parser.reset('01.script')
+            Parser.run()
+        }
+    }
 
     Button {
         x: 300
@@ -56,7 +73,7 @@ ApplicationWindow {
             label.fontInfo=({name:'Ping Fang SC', pointSize:50, color:'white', lineGap:0.1})
             label.text='Hello World! This is the first line! and 2nd 3rd and many, h'
             label.play(1.0, function(){Notification.notify({class:'Text', name:'play'})})
-            Notification.wait({class:'Text',name:'play'})
+            Notification.wait({class:'Text',name:'play'}, function(){console.log("detected play ended.")})
         }
     }
     Button {
@@ -74,10 +91,7 @@ ApplicationWindow {
         text: 'fadeout'
         onClicked: {
             label.fadeout(2000, function(){Notification.notify({class:'Text', name:'fade'})})
-            Notification.wait({class:'Text', name:'fade'})
-        }
-        function onFadeoutEnded(){
-            console.log('detected fadeout ended.')
+            Notification.wait({class:'Text', name:'fade'}, function(){console.log('detected fadeout ended.')})
         }
     }
 }

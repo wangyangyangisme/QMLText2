@@ -19,13 +19,15 @@ public:
 
 
     // ------------------- QML Func ---------------------------
-    Q_INVOKABLE void test() {qDebug()<<"This is a test"<<endl;}
-    Q_INVOKABLE QString resourcePath(QString file);
+    //  File Path
     Q_INVOKABLE QString dataPath(QString file);
     Q_INVOKABLE bool exist(QString path);
-    Q_INVOKABLE bool write(QString path, QString data);
+    Q_INVOKABLE QString resourcePath(QString file);
+    //  File IO
+    Q_INVOKABLE QStringList lines(QString path);
     Q_INVOKABLE QString read(QString path);
     Q_INVOKABLE bool remove(QString path);
+    Q_INVOKABLE bool write(QString path, QString data);
 
     // ------------------- C++ Func ---------------------------
 

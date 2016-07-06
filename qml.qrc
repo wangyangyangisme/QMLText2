@@ -5,5 +5,7 @@
         <file>B2Label.qml</file>
         <file>B2LabelFunc.qml</file>
         <file>B2Notification.qml</file>
+        <file>B2Parser.qml</file>
+        <file>B2Func.qml</file>
     </qresource>
 </RCC>

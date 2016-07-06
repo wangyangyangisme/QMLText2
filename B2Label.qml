@@ -57,7 +57,6 @@ Item {
         // shadow module <--- text0
         // using: property var shadowInfo: ({offset:{x:2,y:2}, opacity:0.7})
         Text{
-            id: shadow
             // geo
             leftPadding: text0.leftPadding
             width: text0.width
@@ -76,7 +75,6 @@ Item {
 
         // gradient module <--- text0
         LinearGradient{
-            id: grad
             source: text0
             // geo
             anchors.fill: text0
@@ -122,7 +120,6 @@ Item {
         }
         visible: false
     }
-
     ThresholdMask{
         id: playMask
         source: t
@@ -134,20 +131,17 @@ Item {
         spread: 0.5
         threshold: 1-playProcess
     }
-    NumberAnimation on playProcess {id:playAnim;from:0;to:1;running:false;
-        property var myOnStopped
-        onStopped:myOnStopped()
-    }
+    NumberAnimation on playProcess {id:playAnim;from:0;to:1;running:false}
     function play(speed,onStopped){
         if(!speed || speed<0) speed=1.0
         totalWidth=LabelFunc.mesureWidth(text,fontInfo.name,fontInfo.pointSize)
         var totalDuration=totalWidth/text0.width/speed * 1000
         if(totalDuration<50) totalDuration=50
         playAnim.duration=totalDuration
-        playAnim.myOnStopped=function(){
+        playAnim.stopped.connect(function(){
             playProcess=1
             if(onStopped) onStopped()
-        }
+        })
         playAnim.restart()
         return totalDuration
     }
@@ -159,7 +153,6 @@ Item {
     property real fadeoutProcess:0
     opacity: 1-fadeoutProcess
     GaussianBlur{
-        id: gBlur
         source: playMask
         // geo
         anchors.fill: playMask
@@ -169,7 +162,6 @@ Item {
         samples: 20
     }
     DirectionalBlur{
-        id: dBlur
         source: playMask
         // geo
         anchors.fill: playMask
@@ -179,17 +171,14 @@ Item {
         opacity: 0.7+5*fadeoutProcess
         samples: 20
     }
-    NumberAnimation on fadeoutProcess {id:fadeoutAnim;from:0;to:1;easing.type:Easing.InOutQuad;running:false;
-        property var myOnStopped
-        onStopped: myOnStopped()
-    }
+    NumberAnimation on fadeoutProcess {id:fadeoutAnim;from:0;to:1;easing.type:Easing.InOutQuad;running:false}
     function fadeout(duration,onStopped){
         fadeoutAnim.duration=duration
-        fadeoutAnim.myOnStopped=function(){
+        fadeoutAnim.stopped.connect(function(){
             text=''
             fadeoutProcess=0
             if(onStopped) onStopped()
-        }
+        })
         fadeoutAnim.restart()
     }
 
